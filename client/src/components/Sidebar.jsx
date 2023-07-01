@@ -3,6 +3,7 @@ import {
   ChevronRightOutlined,
   HomeOutlined,
   ReceiptLongOutlined,
+  SettingsOutlined,
 } from "@mui/icons-material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EmailIcon from "@mui/icons-material/Email";
@@ -24,7 +25,7 @@ import {
   useTheme,
 } from "@mui/material";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBox from "./FlexBox";
 
@@ -66,6 +67,7 @@ const navItems = [
 ];
 
 const Sidebar = ({
+  //user,
   drawerWidth,
   isSidebarOpen,
   setIsSidebarOpen,
@@ -177,6 +179,28 @@ const Sidebar = ({
                 );
               })}
             </List>
+          </Box>
+
+          {/*profile area below sidebar*/}
+          <Box position="absolute" bottom="2rem" sx={{ color: "black" }}>
+            <Divider />
+            <FlexBox gap="1rem" m="1.5rem 2rem 0 3rem">
+              <Box
+                component="img"
+                alt="profile"
+                src={"https://reactjs.org/logo-og.png"}
+                height="40px"
+                width="40px"
+                borderRadius="50%"
+                sx={{ objectFit: "cover" }}
+              />
+              <Box textAlign="left">
+                <Typography fontWeight="bold" fontSize="0.9rem">
+                  Username
+                </Typography>
+              </Box>
+              <SettingsOutlined sx={{ fontSize: "25px" }} />
+            </FlexBox>
           </Box>
         </Drawer>
       )}

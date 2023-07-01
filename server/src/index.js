@@ -20,8 +20,9 @@ app.use("/socials", socialRoutes);
 
 const PORT = process.env.PORT || 9000;
 
-mongoose.connect(process.env.MONGO_URL).catch((err) => {
-  console.log(`${err}did not connect`);
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 
 app.listen(PORT, () => {
