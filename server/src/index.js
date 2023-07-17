@@ -2,22 +2,24 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
-import { generalRoutes } from "../routes/general.js";
-import { socialRoutes } from "../routes/socials.js";
 import { userRouter } from "../routes/users.js";
+
+//data imports
+import { dataUser } from "../data/data.js";
+import { UserModel } from "../models/Users.js";
 
 dotenv.config();
 const app = express();
 
 //middleware data parsers
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); //parse json data -> object
+app.use(express.urlencoded({ extended: false })); // parse URL-encoded data -> object
+app.use(cors()); //ability for frontend to access our apis
 
 //Routes
 app.use("/user/auth", userRouter);
-app.use("/general", generalRoutes);
-app.use("/socials", socialRoutes);
 
+//link to our api
 const PORT = process.env.PORT || 9000;
 
 mongoose.connect(process.env.MONGO_URL, {
@@ -27,4 +29,7 @@ mongoose.connect(process.env.MONGO_URL, {
 
 app.listen(PORT, () => {
   console.log(`Express server listening on port: ${PORT}`);
+
+  //ONE time data import
+  // UserModel.insertMany(dataUser);
 });

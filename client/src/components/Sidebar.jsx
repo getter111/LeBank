@@ -199,7 +199,12 @@ const Sidebar = ({
                   Username
                 </Typography>
               </Box>
-              <SettingsOutlined sx={{ fontSize: "25px" }} />
+              <IconButton
+                onClick={() => console.log("open settings")}
+                sx={{ margin: "0px", padding: "0px" }}
+              >
+                <SettingsOutlined sx={{ fontSize: "25px" }} />
+              </IconButton>
             </FlexBox>
           </Box>
         </Drawer>
