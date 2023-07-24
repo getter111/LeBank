@@ -39,7 +39,7 @@ const navItems = [
     icon: <ReceiptLongOutlined />,
   },
   {
-    text: "Add Account",
+    text: "Connect a bank account",
     icon: <AccountBalanceIcon />,
   },
   {
@@ -67,16 +67,19 @@ const navItems = [
 ];
 
 const Sidebar = ({
-  //user,
+  user,
   drawerWidth,
   isSidebarOpen,
   setIsSidebarOpen,
   isNonMobile,
+  setUserId,
 }) => {
   const { pathname } = useLocation(); //to map icon to current location
-  const [active, setActive] = useState(""); //keep track of current URL
+  const [active, setActive] = useState("64bad48e38f3cbbee41def65"); //keep track of current URL
   const navigate = useNavigate(); //when icon is clicked navigate
   const theme = useTheme();
+  user.img =
+    "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg";
 
   //when pathname changes we change active to the current URL
   //we use substring 1 because it returns /pathname (we dont want the "/")
@@ -139,7 +142,7 @@ const Sidebar = ({
                   );
                 }
 
-                const lcText = text.toLowerCase().replaceAll(" ", "");
+                const lcText = text.toLowerCase().replaceAll(" ", "-");
 
                 return (
                   <ListItem key={text} disablePadding>
@@ -188,7 +191,7 @@ const Sidebar = ({
               <Box
                 component="img"
                 alt="profile"
-                src={"https://reactjs.org/logo-og.png"}
+                src={user.img ? user.img : "https://reactjs.org/logo-og.png"}
                 height="40px"
                 width="40px"
                 borderRadius="50%"
@@ -196,12 +199,18 @@ const Sidebar = ({
               />
               <Box textAlign="left">
                 <Typography fontWeight="bold" fontSize="0.9rem">
-                  Username
+                  {user.username}
                 </Typography>
               </Box>
               <IconButton
                 onClick={() => console.log("open settings")}
-                sx={{ margin: "0px", padding: "0px" }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "white",
+                  },
+                  margin: "0px",
+                  padding: "0px",
+                }}
               >
                 <SettingsOutlined sx={{ fontSize: "25px" }} />
               </IconButton>

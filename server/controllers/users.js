@@ -29,7 +29,7 @@ export const registerUser = async (req, res) => {
   // //confirm user doesn't already exists
   const user = await UserModel.findOne({ username: username });
   if (user) {
-    return res.json({
+    return res.status(400).json({
       message: "User already exists! Please choose another username!",
     });
   }
@@ -40,7 +40,7 @@ export const registerUser = async (req, res) => {
   //add the user to my database
   const newUser = new UserModel({ username, password: hashPass });
   await newUser.save();
-  res.json({ message: "User registered successfully" });
+  res.status(201).json({ message: "User registered successfully" });
 };
 
 /**
@@ -54,17 +54,21 @@ export const loginUser = async (req, res) => {
   const user = await UserModel.findOne({ username: username });
 
   if (!user) {
-    return res.json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found", status: 404 });
   }
 
   //compare if passwords match
   const validPass = await bcrypt.compare(password, user.password);
 
   if (!validPass) {
-    return res.json({ message: "Username or password does not match" });
+    return res.status(404).json({
+      message: "Username or password does not match",
+      input: password,
+      status: 404,
+    });
   }
 
   //is a valid password... now logging in the user
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  res.json({ token, userId: user._id });
+  res.status(200).json({ token, userId: user._id });
 };

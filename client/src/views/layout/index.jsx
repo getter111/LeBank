@@ -6,42 +6,44 @@ import Sidebar from "../../components/Sidebar";
 import { getUserData } from "../../state/api.js";
 //TODO: CREATE API ENDPOINTS. SO FRONTEND CAN ACCESS DATA
 
-const Layout = () => {
+const Layout = ({ userId, setUserId }) => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [userData, setUserData] = useState([]); //data of our user
+  const [userData, setUserData] = useState({}); //data of our user
 
-  //some initial data for our website
   useEffect(() => {
-    const firstLoadData = () => {
-      //pass id into helper function to get user data
-      getUserData("63701cc1f03239c72c00017f")
-        .then((result) => {
-          setUserData(result.data);
-          console.log(userData);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    const firstLoadData = async (userId) => {
+      try {
+        const result = await getUserData(userId);
+        setUserData(result.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
+    firstLoadData(userId);
+  }, [userId]);
 
-    firstLoadData();
-  }, []);
+  useEffect(() => {
+    console.log("updated?");
+    console.log(userData);
+  }, [userData]);
 
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">
       <Sidebar
-        //user={data || {}}
+        user={userData || {}}
         isNonMobile={isNonMobile}
         drawerWidth="250px"
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        setUserId={setUserId}
       />
       <Box flexGrow={1}>
         <Navbar
-          //user={data || {}}
+          user={userData || {}}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
+          setUserId={setUserId}
         />
         <Outlet /> {/* renders child components below our Layout component */}
       </Box>

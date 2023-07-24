@@ -11,7 +11,8 @@ export async function getUserData(id) {
     const endpoint = base_url + "/user/auth/get/" + id;
     return await axios.get(endpoint); //call api at our endpoint
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return error.response.request.status;
   }
 
   //getUser api endpoint:something like VITE_BASE_URL.join(/user/auth/get/${id})
