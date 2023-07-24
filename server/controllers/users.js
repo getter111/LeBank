@@ -26,7 +26,7 @@ export const getUser = async (req, res) => {
 export const registerUser = async (req, res) => {
   const { username, password } = req.body;
 
-  // //confirm user doesn't already exists
+  //confirm user doesn't already exists
   const user = await UserModel.findOne({ username: username });
   if (user) {
     return res.status(400).json({
