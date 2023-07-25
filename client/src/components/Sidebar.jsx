@@ -65,6 +65,7 @@ const navItems = [
     icon: <HelpIcon />,
   },
 ];
+// const defaultUser = "64bad48e38f3cbbee41def65";
 
 const Sidebar = ({
   user,
@@ -74,9 +75,9 @@ const Sidebar = ({
   isNonMobile,
   setUserId,
 }) => {
-  const { pathname } = useLocation(); //to map icon to current location
-  const [active, setActive] = useState("64bad48e38f3cbbee41def65"); //keep track of current URL
-  const navigate = useNavigate(); //when icon is clicked navigate
+  const { pathname } = useLocation(); //indicates the curr url path
+  const [active, setActive] = useState(""); //keep track of current URL
+  const navigate = useNavigate(); // works in conjunction with uselocation to keep track of url path
   const theme = useTheme();
   user.img =
     "https://upload.wikimedia.org/wikipedia/commons/a/a5/Red_Kitten_01.jpg";

@@ -6,7 +6,7 @@ import Sidebar from "../../components/Sidebar";
 import { getUserData } from "../../state/api.js";
 //TODO: CREATE API ENDPOINTS. SO FRONTEND CAN ACCESS DATA
 
-const Layout = ({ userId, setUserId }) => {
+const Layout = ({ userId, setUserId, setUser, currentPage }) => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [userData, setUserData] = useState({}); //data of our user
@@ -44,6 +44,8 @@ const Layout = ({ userId, setUserId }) => {
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           setUserId={setUserId}
+          setUser={setUser}
+          currentPage={currentPage}
         />
         <Outlet /> {/* renders child components below our Layout component */}
       </Box>

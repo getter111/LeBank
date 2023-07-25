@@ -4,7 +4,7 @@ import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
 import { Form } from "./form";
 
-export const Login = ({ setUserId }) => {
+export const Login = ({ setUserId, setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [cookies, setCookies] = useCookies(["access_token"]);
@@ -30,6 +30,7 @@ export const Login = ({ setUserId }) => {
         setCookies("access_token", response.data.token);
         //set userId in global state located -> App.jsx
         setUserId(response.data.userId);
+        setUser(username);
         navigate("/");
         alert("Woohoo");
       } else {

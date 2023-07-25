@@ -17,3 +17,14 @@ export async function getUserData(id) {
 
   //getUser api endpoint:something like VITE_BASE_URL.join(/user/auth/get/${id})
 }
+
+export async function getLinkToken(username) {
+  try {
+    const base_url = import.meta.env.VITE_BASE_URL;
+    const endpoint = base_url + "/plaid/create_link_token/" + username;
+    return await axios.post(endpoint); //call plaid api
+  } catch (error) {
+    console.error(error);
+    return error.response.request.status;
+  }
+}

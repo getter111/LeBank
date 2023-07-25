@@ -2,10 +2,10 @@ import React from "react";
 import { Login } from "./login.jsx";
 import { Register } from "./register.jsx";
 
-const Auth = ({ setUserId }) => {
+const Auth = ({ setUserId, setUser }) => {
   return (
     <div className="auth">
-      <Login setUserId={setUserId} />
+      <Login setUserId={setUserId} setUser={setUser} />
       <Register />
     </div>
   );

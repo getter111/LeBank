@@ -22,7 +22,14 @@ import FlexBox from "./FlexBox";
 {
   /*passing the state setter and state itself allows for sync of state btwn parent and child component*/
 }
-const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen, setUserId }) => {
+const Navbar = ({
+  user,
+  isSidebarOpen,
+  setIsSidebarOpen,
+  setUserId,
+  setUser,
+  currentPage,
+}) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const isOpen = Boolean(anchorEl);
@@ -36,11 +43,16 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen, setUserId }) => {
   };
   const handleClose = () => setAnchorEl(null);
 
+  const defaultUser = {
+    id: "64bad48e38f3cbbee41def65",
+    name: "User",
+  };
   //resets cookies and userId
   const logout = () => {
     handleClose();
     setCookies("access_token", "");
-    setUserId("64bad48e38f3cbbee41def65");
+    setUserId(defaultUser.id);
+    setUser(defaultUser.name);
     navigate("/manage-account");
   };
   const login = () => {
@@ -73,7 +85,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen, setUserId }) => {
 
           <FlexBox>
             <Typography variant="h3" sx={{ paddingLeft: "1rem" }}>
-              Current Page
+              {currentPage}
             </Typography>
           </FlexBox>
         </FlexBox>
