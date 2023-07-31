@@ -115,7 +115,7 @@ const Sidebar = ({
                   <Typography
                     variant="h4"
                     fontWeight="bold"
-                    sx={{ color: "black" }}
+                    sx={{ color: theme.palette.text.secondary }}
                   >
                     FinanaceHub
                   </Typography>
@@ -136,7 +136,10 @@ const Sidebar = ({
                   return (
                     <Typography
                       key={text}
-                      sx={{ m: "2.25rem 0 1rem 3rem", color: "black" }}
+                      sx={{
+                        m: "2.25rem 0 1rem 3rem",
+                        color: theme.palette.text.secondary,
+                      }}
                     >
                       {text}
                     </Typography>
@@ -159,7 +162,7 @@ const Sidebar = ({
                             : theme.palette.primary.main,
                         color:
                           active === lcText
-                            ? "black"
+                            ? theme.palette.text.secondary
                             : theme.palette.secondary.main,
                       }}
                     >
@@ -168,7 +171,7 @@ const Sidebar = ({
                           ml: "2rem",
                           color:
                             active === lcText
-                              ? "black"
+                              ? theme.palette.text.secondary
                               : theme.palette.secondary.main,
                         }}
                       >
@@ -186,7 +189,11 @@ const Sidebar = ({
           </Box>
 
           {/*profile area below sidebar*/}
-          <Box position="absolute" bottom="2rem" sx={{ color: "black" }}>
+          <Box
+            position="absolute"
+            bottom="2rem"
+            sx={{ color: theme.palette.text.secondary }}
+          >
             <Divider />
             <FlexBox gap="1rem" m="1.5rem 2rem 0 3rem">
               <Box
@@ -200,14 +207,14 @@ const Sidebar = ({
               />
               <Box textAlign="left">
                 <Typography fontWeight="bold" fontSize="0.9rem">
-                  {user.username}
+                  {user.username ? user.username : "loading"}
                 </Typography>
               </Box>
               <IconButton
                 onClick={() => console.log("open settings")}
                 sx={{
                   "&:hover": {
-                    backgroundColor: "white",
+                    backgroundColor: "orange",
                   },
                   margin: "0px",
                   padding: "0px",

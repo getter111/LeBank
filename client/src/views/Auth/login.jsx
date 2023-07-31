@@ -9,6 +9,10 @@ export const Login = ({ setUserId, setUser }) => {
   const [password, setPassword] = useState("");
   const [cookies, setCookies] = useCookies(["access_token"]);
 
+  // Set the expiration date to one hour from the current time
+  const expirationDate = new Date();
+  expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000);
+
   const navigate = useNavigate();
 
   const onSubmit = async (event) => {
@@ -27,10 +31,22 @@ export const Login = ({ setUserId, setUser }) => {
         cookies.access_token === ""
       ) {
         //set jwt token into cookies
-        setCookies("access_token", response.data.token);
+        setCookies("access_token", response.data.token, {
+          expires: expirationDate,
+          path: "/",
+          sameSite: "none",
+          secure: true,
+        });
+
         //set userId in global state located -> App.jsx
-        setUserId(response.data.userId);
-        setUser(username);
+        // setUserId(response.data.userId);
+        // setUser(username);
+        window.localStorage.setItem("username", username);
+        //update cookies for user
+        // updateUserCookie(response.data.userId, {
+        //   cookies: response.data.token,
+        // });
+
         navigate("/");
         alert("Woohoo");
       } else {
@@ -52,6 +68,7 @@ export const Login = ({ setUserId, setUser }) => {
       setPassword={setPassword}
       formType="Login"
       onSubmit={onSubmit}
+      displayReset={true}
     />
   );
 };

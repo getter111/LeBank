@@ -14,6 +14,7 @@ export const customTheme = {
     },
   },
 
+  // styling for <Typography/>
   typography: {
     fontFamily: ["Inter", "sans-serif"].join(","),
     fontSize: 12,
@@ -24,6 +25,7 @@ export const customTheme = {
     h2: {
       fontFamily: ["Inter", "sans-serif"].join(","),
       fontSize: 24,
+      fontWeight: "bold",
     },
     h3: {
       fontFamily: ["Inter", "sans-serif"].join(","),

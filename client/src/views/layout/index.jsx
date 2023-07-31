@@ -14,6 +14,7 @@ const Layout = ({ userId, setUserId, setUser, currentPage }) => {
   useEffect(() => {
     const firstLoadData = async (userId) => {
       try {
+        console.log("firstLoadData:", userId);
         const result = await getUserData(userId);
         setUserData(result.data);
       } catch (error) {
@@ -23,10 +24,10 @@ const Layout = ({ userId, setUserId, setUser, currentPage }) => {
     firstLoadData(userId);
   }, [userId]);
 
-  useEffect(() => {
-    console.log("updated?");
-    console.log(userData);
-  }, [userData]);
+  // useEffect(() => {
+  //   console.log("updated?");
+  //   console.log(userData);
+  // }, [userData]);
 
   return (
     <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">

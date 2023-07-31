@@ -37,6 +37,7 @@ export const Register = () => {
       setPassword={setPassword}
       formType="Register"
       onSubmit={onSubmit}
+      displayReset={false}
     />
   );
 };

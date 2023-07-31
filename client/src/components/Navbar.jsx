@@ -53,6 +53,7 @@ const Navbar = ({
     setCookies("access_token", "");
     setUserId(defaultUser.id);
     setUser(defaultUser.name);
+    window.localStorage.clear();
     navigate("/manage-account");
   };
   const login = () => {
@@ -80,7 +81,9 @@ const Navbar = ({
               },
             }}
           >
-            <MenuIcon sx={{ color: "white", fontSize: "25px" }} />
+            <MenuIcon
+              sx={{ color: theme.palette.text.primary, fontSize: "25px" }}
+            />
           </IconButton>
 
           <FlexBox>
@@ -100,22 +103,36 @@ const Navbar = ({
               },
             }}
           >
-            <SettingsOutlined sx={{ color: "white", fontSize: "25px" }} />
+            <SettingsOutlined
+              sx={{ color: theme.palette.text.primary, fontSize: "25px" }}
+            />
           </IconButton>
 
           <Menu anchorEl={anchorEl} open={isOpen} onClose={handleClose}>
-            <MenuItem sx={{ color: "black" }} onClick={handleClose}>
+            <MenuItem
+              sx={{ color: theme.palette.text.secondary }}
+              onClick={handleClose}
+            >
               Profile
             </MenuItem>
-            <MenuItem sx={{ color: "black" }} onClick={handleClose}>
+            <MenuItem
+              sx={{ color: theme.palette.text.secondary }}
+              onClick={handleClose}
+            >
               Settings
             </MenuItem>
             {!cookies.access_token ? (
-              <MenuItem sx={{ color: "black" }} onClick={login}>
+              <MenuItem
+                sx={{ color: theme.palette.text.secondary }}
+                onClick={login}
+              >
                 Login
               </MenuItem>
             ) : (
-              <MenuItem sx={{ color: "black" }} onClick={logout}>
+              <MenuItem
+                sx={{ color: theme.palette.text.secondary }}
+                onClick={logout}
+              >
                 Logout
               </MenuItem>
             )}
