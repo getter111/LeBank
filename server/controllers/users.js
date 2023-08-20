@@ -10,13 +10,27 @@ import { UserModel } from "../models/Users.js";
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(id); //returns the specific object
     res.status(200).json(user);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
 };
 
+/**
+ * funtion that responds to get request for a specific username
+ * @param username the specified username in the url
+ * @return the user information with the corresponding "username"
+ */
+export const getUserWithName = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await UserModel.findOne({ username });
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
 /**
  * funtion that registers a new user into the database
  * @param username username for they account
@@ -72,3 +86,19 @@ export const loginUser = async (req, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
   res.status(200).json({ token, userId: user._id });
 };
+
+// export const updateUserCookies = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updateData = req.body;
+
+//     // Find the item by its id and update it with the new data
+//     const updatedItem = await UserModel.findByIdAndUpdate(id, updateData, {
+//       new: true, // Return the updated item
+//     });
+
+//     res.status(200).json(updatedItem);
+//   } catch (error) {
+//     res.status(500).json({ error: "Failed to update item" });
+//   }
+// };

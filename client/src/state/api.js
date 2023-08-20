@@ -18,6 +18,11 @@ export async function getUserData(id) {
   //getUser api endpoint:something like VITE_BASE_URL.join(/user/auth/get/${id})
 }
 
+/**
+ * helper function that calls our api endpoint to get user data from the database
+ * @param username the user's username
+ * @return the data of the user currently in the database
+ */
 export async function getUserDataWithName(username) {
   try {
     const base_url = import.meta.env.VITE_BASE_URL;
@@ -63,11 +68,49 @@ export async function getLinkToken(username) {
  * @param publicToken the user's public token
  * @return the object containing the access token for the user's banking info
  */
-export async function getAccessToken(publicToken) {
+export async function getAccessToken(publicToken, user) {
   try {
     const base_url = import.meta.env.VITE_BASE_URL;
     const endpoint = base_url + "/plaid/exchange_public_token";
-    return await axios.post(endpoint, { public_token: publicToken }); //call plaid api passing in the endpoint and json data
+    return await axios.post(endpoint, {
+      public_token: publicToken,
+      plaid_User: user,
+    }); //call plaid api passing in the endpoint and json data
+  } catch (error) {
+    console.error(error);
+    return error.response.request.status;
+  }
+}
+
+/**
+ * funtion that calls plaids api to get info for SETTING user's banking identification (number, routing)
+ * @param user the user that called this function to get the accesstoken for db
+ * @return array of account ids
+ */
+export async function setBankAccounts(user, institution) {
+  try {
+    const base_url = import.meta.env.VITE_BASE_URL;
+    const endpoint = base_url + "/plaid/auth/set/banks";
+    return await axios.post(endpoint, {
+      username: user,
+      institution: institution,
+    }); //call plaid api passing in the endpoint and json data
+  } catch (error) {
+    console.error(error);
+    return error.response.request.status;
+  }
+}
+
+/**
+ * funtion GETS user's banking identification (number, routing)
+ * @param user the user that called this function
+ * @return the user's banking account info
+ */
+export async function getBankAccounts(user) {
+  try {
+    const base_url = import.meta.env.VITE_BASE_URL;
+    const endpoint = base_url + "/plaid/auth/get/banks/" + user;
+    return await axios.get(endpoint); //call plaid api passing in the endpoint and json data
   } catch (error) {
     console.error(error);
     return error.response.request.status;

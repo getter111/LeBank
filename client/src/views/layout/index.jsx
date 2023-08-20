@@ -14,7 +14,7 @@ const Layout = ({ userId, setUserId, setUser, currentPage }) => {
   useEffect(() => {
     const firstLoadData = async (userId) => {
       try {
-        console.log("firstLoadData:", userId);
+        console.log("firstLoadData id = ", userId);
         const result = await getUserData(userId);
         setUserData(result.data);
       } catch (error) {

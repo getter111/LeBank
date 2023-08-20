@@ -6,9 +6,9 @@ import { plaidRouter } from "../routes/plaid.js";
 import { userRouter } from "../routes/users.js";
 
 //data imports
-import { dataUser } from "../data/data.js";
+import { dataBankAccount, dataUser } from "../data/data.js";
+import { BankAccountModel } from "../models/BankAccounts.js";
 import { UserModel } from "../models/Users.js";
-
 //load env variables
 dotenv.config();
 
@@ -32,9 +32,10 @@ mongoose.connect(process.env.MONGO_URL, {
   useUnifiedTopology: true,
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Express server listening on port: ${PORT}`);
 
   //ONE time data import
   // UserModel.insertMany(dataUser);
+  // BankAccountModel.insertMany(dataBankAccount);
 });

@@ -31,7 +31,7 @@ export const Form = ({
             color: theme.palette.text.primary,
             bgcolor: "#878fff",
             height: "69vh",
-            width: 500,
+            width: 420,
             margin: "6rem 8rem",
           }}
           elevation={10}

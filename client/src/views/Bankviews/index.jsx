@@ -1,30 +1,17 @@
+import { Button, Divider, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { getAccessToken, getLinkToken } from "../../state/api";
-
+import FlexBox from "../../components/FlexBox";
+import { getLinkToken } from "../../state/api";
+import { PlaidAuth } from "./PlaidAuth";
 // username: user_good
 // password: pass_good
 // If prompted to enter a 2FA code: 1234
 
-const PlaidAuth = ({ publicToken }) => {
-  useEffect(() => {
-    const fetchAccessToken = async (publicToken) => {
-      try {
-        const accessToken = await getAccessToken(publicToken);
-        console.log("access token: ", accessToken.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchAccessToken(publicToken);
-  });
-  return <div>{publicToken}</div>;
-};
-
 const BankViews = ({ user }) => {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
+  const [institution, setInstitution] = useState("Some Bank");
   const defaultUser = "User";
 
   useEffect(() => {
@@ -51,15 +38,57 @@ const BankViews = ({ user }) => {
       // send public_token to server
       setPublicToken(public_token);
       console.log("log in success. public_token:", public_token, metadata);
+      setInstitution(metadata.institution.name); //might have to add to db as well hehe
+      console.log(metadata);
     },
   });
 
-  return publicToken ? (
-    <PlaidAuth publicToken={publicToken} />
+  return linkToken ? (
+    <FlexBox
+      sx={{
+        bgcolor: "#32332e",
+        height: "calc(100vh - 4rem)",
+      }}
+    >
+      <FlexBox
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          padding: "4rem",
+          width: "50%",
+          height: "100%",
+        }}
+      >
+        <PlaidAuth
+          publicToken={publicToken}
+          user={user}
+          institution={institution}
+        />
+
+        <FlexBox>
+          <Button
+            onClick={() => open()}
+            disabled={!ready}
+            variant="contained"
+            color="primary"
+            sx={{
+              marginTop: "1rem",
+              width: "45vw",
+              height: "3rem",
+              justifyContent: "flex-start",
+              alignItems: "center",
+            }}
+          >
+            <Typography>Connect a bank account</Typography>
+          </Button>
+        </FlexBox>
+      </FlexBox>
+    </FlexBox>
   ) : (
-    <button onClick={() => open()} disabled={!ready}>
-      Connect a bank account
-    </button>
+    <div>Login to connect to a bank account.</div>
+    //<PlaidAuth/>
   );
 };
 

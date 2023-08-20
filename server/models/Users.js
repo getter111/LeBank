@@ -3,10 +3,22 @@ import { loadType } from "mongoose-currency";
 loadType(mongoose);
 
 let Currency = mongoose.Types.Currency;
+
 const UserSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, unique: true, min: 2, max: 100 },
+    cookies: { type: String },
     password: { type: String, required: true, min: 4 },
+    plaidAccessToken: { type: String },
+    plaidItemId: { type: String },
+    connectedBankAccountIds: [
+      {
+        //array of ids
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BankAccounts",
+      },
+    ],
+
     accountBalance: {
       type: Currency,
       currency: "USD",

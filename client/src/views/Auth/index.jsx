@@ -5,7 +5,14 @@ import { Login } from "./login.jsx";
 import { Register } from "./register.jsx";
 const Auth = ({ setUserId, setUser }) => {
   return (
-    <FlexBox>
+    <FlexBox
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", lg: "row" },
+        height: "calc(100vh - 4rem)",
+        bgcolor: "#040404",
+      }}
+    >
       <Login setUserId={setUserId} setUser={setUser} />
       <Register />
     </FlexBox>
