@@ -1,34 +1,17 @@
-import mongoose, { trusted } from "mongoose";
-
-const reqString = {
-  type: String,
-  required: true,
-};
-
-const reqNumber = {
-  type: Number,
-  required: true,
-};
-const transactionSchema = mongoose.Schema(
-  {
-    userId: reqString,
-    symbol: reqString,
-    storeName: reqString,
-    purchaseAmount: reqNumber,
-    category: reqString,
-    date: {
-      type: Date,
-      required: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+import mongoose from "mongoose";
 
 const FinanceSchema = new mongoose.Schema({
-  transactions: [transactionSchema],
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
+  transaction_id: String,
+  bank_account_id: String,
+  amount: Number,
+  category: String,
+  date: String,
+  authorizedDate: String,
+  name: String,
+  currencyCode: String,
+  pendingTransactionId: String,
 });
 
 //model for our users collection using the UserSchema
-export const FinanceModel = mongoose.model("finances", FinanceSchema);
+export const FinanceModel = mongoose.model("transactions", FinanceSchema);

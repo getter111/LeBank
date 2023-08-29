@@ -1,5 +1,6 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
 import { BankAccountModel } from "../models/BankAccounts.js";
+import { FinanceModel } from "../models/Finances.js";
 import { UserModel } from "../models/Users.js";
 
 const plaidConfig = function () {
@@ -38,7 +39,7 @@ export const createLinkToken = async function (req, res) {
         client_user_id: clientUserId,
       },
       client_name: "Plaid Test App",
-      products: ["auth"],
+      products: ["auth", "transactions"],
       language: "en",
       redirect_uri: "http://localhost:5173/",
       country_codes: ["US"],
@@ -69,7 +70,7 @@ export const exchangePublicToken = async function (req, res, next) {
     // These values should be saved to a persistent database and
     // associated with the currently signed-in user
     const accessToken = response.data.access_token;
-    const itemID = response.data.item_id;
+    const itemID = response.data.item_id; //plaid id representing a connection to a bank
 
     //saving data to our db (<filter>, <data>)
     const update = await UserModel.updateOne(
@@ -89,6 +90,8 @@ export const exchangePublicToken = async function (req, res, next) {
     res.status(500).json("error exchanging public token");
   }
 };
+
+// PlaidAuth stuff (retrieve and verify bank account info)//
 
 /**
  * funtion that calls plaids api to set user's banking identification in the db
@@ -137,7 +140,9 @@ export const setBankAccounts = async function (req, res) {
     }
 
     // Get the IDs from the inserted bank accounts to add them to the user's connectedBankAccountIds array. if insertedBankAccountDocs is empty these never run either
-    const bankAccountIds = insertedBankAccountDocs.map((doc) => doc._id);
+    const bankAccountIds = insertedBankAccountDocs.map(
+      (doc) => doc.achNumbers.account_id
+    );
     bankAccountIds.forEach((id) => user.connectedBankAccountIds.push(id));
     await user.save();
 
@@ -157,9 +162,9 @@ export const getBankAccounts = async function (req, res) {
     const { username } = req.params;
     // const username = req.body.username;
     const user = await UserModel.findOne({ username: username });
-    //find the bank accounts in the user's associated banks id array
+    // retrieve the associated bank accounts from BankAccountModel
     const associatedBankAccounts = await BankAccountModel.find({
-      _id: { $in: user.connectedBankAccountIds },
+      "achNumbers.account_id": { $in: user.connectedBankAccountIds },
     });
 
     const achNumbersList = [];
@@ -179,5 +184,82 @@ export const getBankAccounts = async function (req, res) {
     });
   } catch (err) {
     res.status(500).json("failesdfd GETTING banking information");
+  }
+};
+
+// PlaidTransaction stuff (retrieve and verify bank account info)//
+
+/**
+ * fetches transactions data with the plaidapi and handles pagination if there are more transactions data to fetch.
+ * @param accessToken the user's accessToken
+ * @param cursor the user's cursor (starting line)
+ * @return transactions data
+ */
+const syncMoreNewData = async function (accessToken, cursor) {
+  const plaidClient = plaidConfig();
+  const allData = { added: [], modified: [], removed: [], nextCursor: cursor };
+  let hasMore = true;
+
+  while (hasMore) {
+    const request = {
+      access_token: accessToken,
+      cursor: allData.nextCursor,
+      count: 50,
+      options: { include_personal_finance_category: true },
+    };
+
+    const response = await plaidClient.transactionsSync(request);
+    const newData = response.data;
+
+    // Add this page of results
+    allData.added = allData.added.concat(newData.added);
+    allData.modified = allData.modified.concat(newData.modified);
+    allData.removed = allData.removed.concat(newData.removed);
+    hasMore = newData.has_more;
+
+    // Update cursor to the next cursor
+    allData.nextCursor = newData.next_cursor;
+  }
+
+  return allData;
+};
+
+/**
+ * gets users transactions.
+ * @return transactions data
+ */
+export const getTransactions = async function (req, res) {
+  try {
+    const username = req.body.username;
+    const user = await UserModel.findOne({ username: username });
+
+    const accessToken = user.plaidAccessToken;
+    let cursor = user.transactionsCursor || null; // Use the stored cursor from the user object. (starting point when fetching transactions again in the future)
+
+    //transactionsData should send back unique transaction data as long as cursor is unique for the accesstoken
+    const transactionsData = await syncMoreNewData(accessToken, cursor);
+    user.transactionsCursor = transactionsData.nextCursor;
+    await user.save();
+
+    // Map fields from the Plaid transaction response
+    const transactionsToAdd = transactionsData.added.map((trans) => ({
+      userId: user._id,
+      transaction_id: trans.transaction_id,
+      bank_account_id: trans.account_id,
+      amount: trans.amount,
+      category: trans.personal_finance_category.primary,
+      date: trans.date,
+      authorizedDate: trans.authorized_date,
+      name: trans.merchant_name ? trans.merchant_name : trans.name,
+      currencyCode: trans.iso_currency_code,
+      pendingTransactionId: trans.pending_transaction_id,
+    }));
+
+    // Save the fetched transactions to the MongoDB collection
+    await FinanceModel.insertMany(transactionsToAdd);
+
+    res.json(transactionsToAdd);
+  } catch (error) {
+    res.status(500).json("failed getting transactions");
   }
 };

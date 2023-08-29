@@ -11,29 +11,24 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true, min: 4 },
     plaidAccessToken: { type: String },
     plaidItemId: { type: String },
-    connectedBankAccountIds: [
-      {
-        //array of ids
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "BankAccounts",
-      },
-    ],
+    transactionsCursor: { type: String },
+    connectedBankAccountIds: [{ type: String }],
 
-    accountBalance: {
-      type: Currency,
-      currency: "USD",
-      //since currency takes the val and multiplies by hundred we gotta divide by 100 to get true val
-      get: (val) => val / 100,
-    },
-    transactions: { type: Array },
-    expensesByCategory: {
-      type: Map,
-      of: {
-        type: Currency,
-        currency: "USD",
-        get: (val) => val / 100,
-      },
-    },
+    // accountBalance: {
+    //   type: Currency,
+    //   currency: "USD",
+    //   //since currency takes the val and multiplies by hundred we gotta divide by 100 to get true val
+    //   get: (val) => val / 100,
+    // },
+    // transactions: { type: Array },
+    // expensesByCategory: {
+    //   type: Map,
+    //   of: {
+    //     type: Currency,
+    //     currency: "USD",
+    //     get: (val) => val / 100,
+    //   },
+    // },
   },
   {
     timestamps: true,
