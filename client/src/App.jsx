@@ -5,6 +5,8 @@ import { useCookies } from "react-cookie";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { getUserDataWithName } from "./state/api.js";
 import { customTheme } from "./theme.js";
+import AccountInfo from "./views/AccountInfo/index.jsx";
+import Accountant from "./views/Accountant/index.jsx";
 import Auth from "./views/Auth/index.jsx";
 import BankViews from "./views/Bankviews/index.jsx";
 import Dashboard from "./views/dashboard/index.jsx";
@@ -69,15 +71,41 @@ function App() {
                 />
               }
             >
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/"
+                element={<Dashboard setCurrentPage={setCurrentPage} />}
+              />
+              <Route
+                path="/dashboard"
+                element={<Dashboard setCurrentPage={setCurrentPage} />}
+              />
               <Route
                 path="/connect-a-bank-account"
-                element={<BankViews user={user} />}
+                element={
+                  <BankViews user={user} setCurrentPage={setCurrentPage} />
+                }
               />
               <Route
                 path="/manage-account"
-                element={<Auth setUser={setUser} setUserId={setUserId} />}
+                element={
+                  <Auth
+                    setUser={setUser}
+                    setUserId={setUserId}
+                    setCurrentPage={setCurrentPage}
+                  />
+                }
+              />
+              <Route
+                path="/accountant"
+                element={
+                  <Accountant user={user} setCurrentPage={setCurrentPage} />
+                }
+              />
+              <Route
+                path="/account-info"
+                element={
+                  <AccountInfo setCurrentPage={setCurrentPage}></AccountInfo>
+                }
               />
             </Route>
           </Routes>

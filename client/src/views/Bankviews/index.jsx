@@ -1,4 +1,4 @@
-import { Button, Divider, Typography } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import FlexBox from "../../components/FlexBox";
@@ -8,11 +8,12 @@ import { PlaidAuth } from "./PlaidAuth";
 // password: pass_good
 // If prompted to enter a 2FA code: 1234
 
-const BankViews = ({ user }) => {
+const BankViews = ({ user, setCurrentPage }) => {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
   const [institution, setInstitution] = useState("Some Bank");
   const defaultUser = "User";
+  setCurrentPage("Connect Bank Account");
 
   useEffect(() => {
     const userLoggedin = async (user) => {
@@ -40,6 +41,7 @@ const BankViews = ({ user }) => {
       console.log("log in success. public_token:", public_token, metadata);
       setInstitution(metadata.institution.name); //might have to add to db as well hehe
       console.log(metadata);
+      console.log("institution: ", metadata.institution.name);
     },
   });
 

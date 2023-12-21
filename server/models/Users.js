@@ -20,7 +20,6 @@ const UserSchema = new mongoose.Schema(
     //   //since currency takes the val and multiplies by hundred we gotta divide by 100 to get true val
     //   get: (val) => val / 100,
     // },
-    // transactions: { type: Array },
     // expensesByCategory: {
     //   type: Map,
     //   of: {

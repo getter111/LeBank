@@ -1,16 +1,10 @@
+import { ChevronRightOutlined } from "@mui/icons-material";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore.js";
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Card,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FlexBox from "../../components/FlexBox.jsx";
+
 import {
   getAccessToken,
   getBankAccounts,
@@ -18,38 +12,68 @@ import {
 } from "../../state/api";
 
 const BankInfo = ({ mergedArray }) => {
+  const navigate = useNavigate();
   return (
     <>
       {mergedArray.map(
         ({ accounts, account_id, account, routing, institution }) => (
-          <Accordion key={account_id} sx={{ bgcolor: "red", width: "45vw" }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
+          <div>
+            <FlexBox
+              sx={{
+                justifyContent: "flex-start",
+                width: "100%",
+                margin: "0.2rem",
+                alignContent: "center",
+                alignItems: "center",
+              }}
             >
-              <FlexBox sx={{ paddingRight: "1rem" }}>
-                <AccountBalanceIcon />
-              </FlexBox>
-              <FlexBox sx={{ flexDirection: "column" }}>
-                <FlexBox sx={{ justifyContent: "flex-start", width: "100%" }}>
-                  <Typography>{institution}</Typography>
-                </FlexBox>
+              <Button
+                onClick={() => navigate("/account-info")}
+                variant="contained"
+                color="primary"
+                endIcon={<ChevronRightOutlined />}
+                sx={{
+                  width: "45vw",
+                  height: "4.5rem",
+                }}
+              >
+                <FlexBox
+                  sx={{
+                    justifyContent: "flex-start",
+                    width: "100%",
+                    flexWrap: "wrap",
+                    alignContent: "center",
+                    alignItems: "center",
 
-                <Typography>{accounts.name + " " + account}</Typography>
-              </FlexBox>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>{"Routing: " + routing}</Typography>
-            </AccordionDetails>
-          </Accordion>
+                    // margin: "auto",
+                  }}
+                >
+                  <AccountBalanceIcon
+                    sx={{ width: "5%", marginRight: "0.5rem" }}
+                  />
+                  <Typography
+                    sx={{
+                      flex: "2",
+                      flexShrink: "0",
+                      textAlign: "start",
+                    }}
+                  >
+                    {institution + " " + accounts.name + " *" + "acc#"}
+                  </Typography>
+                  <Typography sx={{ flex: "1", flexShrink: "0" }}>
+                    {"Balance: " + "$1000"}
+                  </Typography>
+                </FlexBox>
+              </Button>
+            </FlexBox>
+          </div>
         )
       )}
     </>
   );
 };
 
-//after user logs in and gets public token we render this component
+//after user logs in and passes in the public token we render this component
 export const PlaidAuth = ({ publicToken, user, institution }) => {
   const [plaidAccessToken, setPlaidAccessToken] = useState();
   const [accounts, setAccounts] = useState([]);
@@ -78,7 +102,7 @@ export const PlaidAuth = ({ publicToken, user, institution }) => {
     const fetchAccessToken = async (publicToken, user) => {
       try {
         const accessToken = await getAccessToken(publicToken, user);
-        // setPlaidAccessToken(accessToken.data.accessToken);
+        setPlaidAccessToken(accessToken.data.accessToken);
         console.log("access token: ", accessToken.data);
       } catch (error) {
         console.error(error);
@@ -102,14 +126,15 @@ export const PlaidAuth = ({ publicToken, user, institution }) => {
         setAccounts(result.data.accountInfoList);
         setAccountNumbers(result.data.achNumbersList);
         //returns array of objects
-        console.log("accounts: ", accounts);
-        console.log("accountNumbers: ", accountNumbers);
+        // console.log("accounts: ", accounts);
+        // console.log("accountNumbers: ", accountNumbers);
       } catch (error) {
         console.error(error);
       }
     };
 
     const fetchData = async () => {
+      //if user clicked the plaid link
       if (publicToken !== undefined) {
         try {
           const accessToken = await fetchAccessToken(publicToken, user);
@@ -130,7 +155,6 @@ export const PlaidAuth = ({ publicToken, user, institution }) => {
   // Calculate mergedArray after fetching data
   const mergedArray = mergeArrays(accounts, accountNumbers);
   console.log("merged array: ", mergedArray);
-  //we need another function that populates the page with bank already in database, we dont want to only rely on fetch to popuate the page. we only fetch when user adds in new bank accounts, otherwise we should reply on the populate function
 
   return (
     <div>

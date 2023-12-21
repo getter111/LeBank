@@ -1,6 +1,7 @@
 import React from "react";
 
-const Dashboard = () => {
+const Dashboard = ({ setCurrentPage }) => {
+  setCurrentPage("Dashboard");
   return <div>Dashboard</div>;
 };
 

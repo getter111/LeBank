@@ -3,7 +3,8 @@ import FlexBox from "../../components/FlexBox.jsx";
 import { Form } from "./form.jsx";
 import { Login } from "./login.jsx";
 import { Register } from "./register.jsx";
-const Auth = ({ setUserId, setUser }) => {
+const Auth = ({ setUserId, setUser, setCurrentPage }) => {
+  setCurrentPage("Manage Account");
   return (
     <FlexBox
       sx={{

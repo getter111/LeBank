@@ -116,3 +116,19 @@ export async function getBankAccounts(user) {
     return error.response.request.status;
   }
 }
+
+/**
+ * funtion GETS user's bank transactions
+ * @param user the user that called this function
+ * @return the user's bank transactions
+ */
+export async function getBankTransactions(user) {
+  try {
+    const base_url = import.meta.env.VITE_BASE_URL;
+    const endpoint = base_url + "/plaid/transactions/sync" + user;
+    return await axios.get(endpoint); //call plaid api passing in the endpoint and json data
+  } catch (error) {
+    console.error(error);
+    return error.response.request.status;
+  }
+}

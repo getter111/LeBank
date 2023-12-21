@@ -22,5 +22,5 @@ router.post("/auth/set/banks", setBankAccounts);
 router.get("/auth/get/banks/:username", getBankAccounts);
 
 //Get incremental transaction updates on an Item
-router.post("/transactions/sync", getTransactions);
+router.get("/transactions/sync/:username", getTransactions);
 export { router as plaidRouter };

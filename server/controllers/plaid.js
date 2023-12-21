@@ -113,9 +113,11 @@ export const setBankAccounts = async function (req, res) {
 
     //add new bank accounts to database and return all bank accounts in db
     const plaidResponse = await plaidClient.authGet(plaidRequest);
+    // console.log(plaidResponse);
 
     const bankAccounts = plaidResponse.data.accounts; //holds the current added accounts
     const bankNumbers = plaidResponse.data.numbers.ach;
+
     //loop thru bankAccounts & bankNumbers
     const bankAccountEntries = bankAccounts.map((acc, index) => ({
       institution: institution, // Assign the institution name
@@ -129,7 +131,8 @@ export const setBankAccounts = async function (req, res) {
     // Check for duplicates and insert only non-duplicate bank account entries
     for (const entry of bankAccountEntries) {
       const duplicate = await BankAccountModel.findOne({
-        "achNumbers.account": entry.achNumbers.account, //using acc # to check dups
+        // "achNumbers.account": entry.achNumbers.account, //using acc # to check dups
+        "achNumbers.account_id": entry.achNumbers.account_id, //using account id to check dups
       });
       //if not found, we add to the collection
       if (!duplicate) {
@@ -230,7 +233,9 @@ const syncMoreNewData = async function (accessToken, cursor) {
  */
 export const getTransactions = async function (req, res) {
   try {
-    const username = req.body.username;
+    // const username = req.body.username;
+    const { username } = req.params;
+
     const user = await UserModel.findOne({ username: username });
 
     const accessToken = user.plaidAccessToken;
