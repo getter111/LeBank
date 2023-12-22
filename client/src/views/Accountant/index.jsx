@@ -1,5 +1,16 @@
-import { Button, Divider, Stack, Typography } from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  Button,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
+
 import FlexBox from "../../components/FlexBox.jsx";
 import TableRow from "../../components/TableRow.jsx";
 
@@ -13,11 +24,21 @@ const TransactionStack = () => {
   return (
     <Stack
       sx={{ border: "1px solid", alignItems: "center" }}
-      spacing={1}
+      spacing={0.69}
       divider={
         <Divider sx={{ bgcolor: "white" }} orientation="horizontal" flexItem />
       }
     >
+      <Typography
+        sx={{
+          border: "1px solid",
+          textAlign: "start",
+          width: "49vw",
+          padding: "0.69rem",
+        }}
+      >
+        ACCOUNT HISTORY
+      </Typography>
       <TableRow
         date={date}
         transactionType={transactionType}
@@ -36,8 +57,71 @@ const TransactionStack = () => {
   );
 };
 
+const ActionsTab = () => {
+  return (
+    <List
+      component={Stack}
+      direction="row"
+      sx={{ border: "1px solid", width: "49vw" }}
+    >
+      <ListItem>
+        <Button
+          sx={{ flex: "1" }}
+          onClick={() => navigate("/")}
+          variant="contained"
+          color="primary"
+          endIcon={<ExpandMoreIcon />}
+        >
+          Date
+        </Button>
+      </ListItem>
+      <ListItem>
+        <Button
+          sx={{ flex: "1" }}
+          onClick={() => navigate("/")}
+          variant="contained"
+          color="primary"
+          endIcon={<ExpandMoreIcon />}
+        >
+          Type
+        </Button>
+      </ListItem>
+      <ListItem>
+        <Button
+          sx={{ flex: "1" }}
+          onClick={() => navigate("/")}
+          variant="contained"
+          color="primary"
+          endIcon={<ExpandMoreIcon />}
+        >
+          Description
+        </Button>
+      </ListItem>
+      <ListItem>
+        <Button
+          sx={{ flex: "1" }}
+          onClick={() => navigate("/")}
+          variant="contained"
+          color="primary"
+          endIcon={<ExpandMoreIcon />}
+        >
+          Cost
+        </Button>
+      </ListItem>
+      <ListItem>
+        <ListItemText
+          sx={{ flex: "1", textAlign: "center", bgcolor: "green" }}
+          id="balance"
+          primary="Balance"
+        />
+      </ListItem>
+    </List>
+  );
+};
+
 const Accountant = ({ setCurrentPage, user }) => {
   setCurrentPage("Accountant");
+
   return (
     <FlexBox
       sx={{
@@ -46,7 +130,24 @@ const Accountant = ({ setCurrentPage, user }) => {
         flexDirection: "column",
       }}
     >
-      <div>gangy</div>
+      <FlexBox
+        sx={{
+          width: "49vw",
+          justifyContent: "flex-start",
+          flexDirection: "row",
+        }}
+      >
+        <Button
+          onClick={() => navigate("/")}
+          variant="contained"
+          color="primary"
+          endIcon={<ExpandMoreIcon />}
+          sx={{ alignSelf: "flex-start", marginBottom: "1em" }}
+        >
+          Last 30 Days
+        </Button>
+      </FlexBox>
+      <ActionsTab />
       <TransactionStack />
     </FlexBox>
   );
