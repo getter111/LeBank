@@ -3,8 +3,9 @@ import {
   createLinkToken,
   exchangePublicToken,
   getBankAccounts,
-  getTransactions,
+  getBankTransactions,
   setBankAccounts,
+  setTransactions,
 } from "../controllers/plaid.js";
 
 const router = express.Router();
@@ -21,6 +22,10 @@ router.post("/auth/set/banks", setBankAccounts);
 //fetches all of user's bank accounts
 router.get("/auth/get/banks/:username", getBankAccounts);
 
-//Get incremental transaction updates on an Item
-router.get("/transactions/sync/:username", getTransactions);
+//Get incremental transaction updates on an Item, put in db
+router.get("/transactions/sync/:username", setTransactions);
+
+//query database for user transactions
+router.post("/get-transactions/:count", getBankTransactions);
+
 export { router as plaidRouter };

@@ -6,11 +6,13 @@ const FinanceSchema = new mongoose.Schema({
   bank_account_id: String,
   amount: Number,
   category: String,
-  date: String,
-  authorizedDate: String,
+  date: Date,
+  authorizedDate: Date,
   name: String,
   currencyCode: String,
   pendingTransactionId: String,
+  pending: Boolean,
+  icon: String,
 });
 
 //model for our users collection using the UserSchema

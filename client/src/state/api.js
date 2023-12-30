@@ -118,15 +118,40 @@ export async function getBankAccounts(user) {
 }
 
 /**
- * funtion GETS user's bank transactions
+ * funtion GETS user's bank transactions and stores it in    the db
  * @param user the user that called this function
- * @return the user's bank transactions
+ * @return status of items that were retrieved
  */
-export async function getBankTransactions(user) {
+export async function setBankTransactions(user) {
   try {
     const base_url = import.meta.env.VITE_BASE_URL;
-    const endpoint = base_url + "/plaid/transactions/sync" + user;
-    return await axios.get(endpoint); //call plaid api passing in the endpoint and json data
+    const endpoint = base_url + "/plaid/transactions/sync/" + user;
+    return await axios.get(endpoint); //call plaid api passing in the endpoint
+  } catch (error) {
+    console.error(error);
+    return error.response.request.status;
+  }
+}
+
+/**
+ * function that querys the database for certain (count) of transactions
+ * @param user verified user to get the transactions from
+ * @param count the number of days to limit transactions queried
+ * @returns list of transactions
+ */
+export async function getBankTransactions(username, dayCount, bankId) {
+  try {
+    //add a bankid param to differentiate which acc, if not all of them...
+    const base_url = import.meta.env.VITE_BASE_URL;
+    const endpoint = base_url + "/plaid/get-transactions/" + dayCount;
+
+    //duplication of count
+
+    return await axios.post(endpoint, {
+      username: username,
+      dayCount: dayCount,
+      bankId: bankId,
+    }); //call plaid api passing in the endpoint and json data
   } catch (error) {
     console.error(error);
     return error.response.request.status;

@@ -224,17 +224,25 @@ const syncMoreNewData = async function (accessToken, cursor) {
     allData.nextCursor = newData.next_cursor;
   }
 
+  //not sure how to check for [] empty array. (means no new transactions were made)
+  if (allData.added.length == 0) {
+    console.log("no items were added");
+  }
+
   return allData;
 };
 
 /**
- * gets users transactions.
- * @return transactions data
+ * gets all user's transactions from the banks and stores it in the transaction collection in the database using plaid.
+ * @return number of items (transactions) added,modified,removed
  */
-export const getTransactions = async function (req, res) {
+
+//note: sholdn't be return(ing) the transaction data, we should be querying the database to get the data. we need to change name to setTransactions instead...
+
+export const setTransactions = async function (req, res) {
   try {
-    // const username = req.body.username;
-    const { username } = req.params;
+    // const username = req.body.username; //json
+    const { username } = req.params; //url
 
     const user = await UserModel.findOne({ username: username });
 
@@ -243,28 +251,117 @@ export const getTransactions = async function (req, res) {
 
     //transactionsData should send back unique transaction data as long as cursor is unique for the accesstoken
     const transactionsData = await syncMoreNewData(accessToken, cursor);
-    user.transactionsCursor = transactionsData.nextCursor;
-    await user.save();
 
-    // Map fields from the Plaid transaction response
-    const transactionsToAdd = transactionsData.added.map((trans) => ({
-      userId: user._id,
-      transaction_id: trans.transaction_id,
-      bank_account_id: trans.account_id,
-      amount: trans.amount,
-      category: trans.personal_finance_category.primary,
-      date: trans.date,
-      authorizedDate: trans.authorized_date,
-      name: trans.merchant_name ? trans.merchant_name : trans.name,
-      currencyCode: trans.iso_currency_code,
-      pendingTransactionId: trans.pending_transaction_id,
-    }));
+    if (
+      transactionsData.added.length > 0 ||
+      transactionsData.modified.length > 0 ||
+      transactionsData.removed.length > 0
+    ) {
+      user.transactionsCursor = transactionsData.nextCursor;
+      await user.save();
 
-    // Save the fetched transactions to the MongoDB collection
-    await FinanceModel.insertMany(transactionsToAdd);
+      // Map fields from the Plaid transaction response
+      const transactionsToAdd = transactionsData.added.map((trans) => ({
+        userId: user._id,
+        transaction_id: trans.transaction_id,
+        bank_account_id: trans.account_id,
+        amount: trans.amount,
+        category: trans.personal_finance_category.primary,
+        date: trans.date,
+        //(pref over date if possible, indicates date the transaction was made/authorized..)
+        authorizedDate: trans.authorized_date,
+        //(The merchant name or transaction description.)
+        name: trans.merchant_name ? trans.merchant_name : trans.name,
+        currencyCode: trans.iso_currency_code,
+        pendingTransactionId: trans.pending_transaction_id,
+        pending: trans.pending,
+        icon: trans.personal_finance_category_icon_url,
+      }));
 
-    res.json(transactionsToAdd);
+      // Save the fetched transactions to the MongoDB collection
+      await FinanceModel.insertMany(transactionsToAdd);
+    }
+    res.status(200).json({
+      added: transactionsData.added.length,
+      modified: transactionsData.modified.length,
+      removed: transactionsData.removed.length,
+    });
   } catch (error) {
+    console.error("Error getting bank transactions:", error);
     res.status(500).json("failed getting transactions");
+  }
+};
+
+/**
+ * gets user's transactions from the bank
+ * @return list of transactions
+ */
+export const getBankTransactions = async (req, res) => {
+  const username = req.body.username;
+  const user = await UserModel.findOne({ username: username });
+  //array of user transactions
+  let transactions = [];
+  const dayCount = req.body.dayCount;
+
+  //filter for which account to display
+  const bankId = req.body.bankId;
+
+  //array of user's bank account ids
+  const userAccounts = user.connectedBankAccountIds;
+
+  try {
+    //show every transaction
+    if (dayCount == "pending") {
+      //show only all pending transactions
+    } else if (dayCount == "all" && bankId == "all") {
+      transactions = await getAllTransactions(user._id, null);
+    } else if (dayCount !== "all" && bankId == "all") {
+      transactions = await getFilteredTransactions(dayCount, null, user._id);
+    } else if (dayCount == "all" && userAccounts.includes(bankId)) {
+      transactions = await getAllTransactions(user._id, bankId);
+    } else if (dayCount !== "all" && userAccounts.includes(bankId)) {
+      transactions = await getFilteredTransactions(dayCount, bankId, user._id);
+    }
+
+    // let today = new Date();
+    // today.setDate(new Date().getDate() - 2);
+    // // "date": "2023-12-30T18:13:22.186Z"
+
+    res
+      .status(200)
+      .json({ count: transactions.length, transactions: transactions });
+  } catch (err) {
+    console.error("Error getting bank transactions:", err);
+    res
+      .status(500)
+      .json("something happened when getting bank transactions lol.");
+  }
+};
+
+/**
+ * helper function that gets ALL of user's transactions for a specific account
+ * @return unfiltered (MANY) transactions
+ */
+const getAllTransactions = async (userId, bankId) => {
+  if (bankId == null) {
+    return await FinanceModel.find({ userId: userId });
+  } else {
+    return await FinanceModel.find({ userId: userId, bank_account_id: bankId });
+  }
+};
+
+/**
+ *
+ * @param dayCount either 30, 60, pending, or all.
+ * @param bankId bankid to used to filter in the query
+ * @param userId user who called the function
+ * @returns
+ */
+const getFilteredTransactions = async (dayCount, bankId, userId) => {
+  if (bankId == null) {
+    //all user accounts
+    return await FinanceModel.find({ userId: userId });
+  } else {
+    return await FinanceModel.find({ bankId: bankId });
   }
 };
