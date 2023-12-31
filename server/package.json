@@ -17,8 +17,8 @@
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.30.1",
     "mongoose": "^7.4.1",
-    "mongoose-currency": "^0.2.0",
     "plaid": "^15.1.0"
   },
   "devDependencies": {

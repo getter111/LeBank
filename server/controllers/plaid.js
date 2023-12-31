@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Configuration, PlaidApi, PlaidEnvironments } from "plaid";
 import { BankAccountModel } from "../models/BankAccounts.js";
 import { FinanceModel } from "../models/Finances.js";
@@ -310,26 +311,31 @@ export const getBankTransactions = async (req, res) => {
   const userAccounts = user.connectedBankAccountIds;
 
   try {
-    //show every transaction
-    if (dayCount == "pending") {
-      //show only all pending transactions
-    } else if (dayCount == "all" && bankId == "all") {
+    if (dayCount == "global" && bankId == "all") {
+      //show every transaction
       transactions = await getAllTransactions(user._id, null);
-    } else if (dayCount !== "all" && bankId == "all") {
+    } else if (dayCount !== "global" && bankId == "all") {
+      //filter is applied on every transaction
       transactions = await getFilteredTransactions(dayCount, null, user._id);
-    } else if (dayCount == "all" && userAccounts.includes(bankId)) {
+    } else if (dayCount == "global" && userAccounts.includes(bankId)) {
+      //show every transactoin of specific account
       transactions = await getAllTransactions(user._id, bankId);
-    } else if (dayCount !== "all" && userAccounts.includes(bankId)) {
+    } else if (dayCount !== "global" && userAccounts.includes(bankId)) {
+      //apply filter on specific account
+      transactions = await getFilteredTransactions(dayCount, bankId, user._id);
+    } else if (dayCount == "pending" && bankId == "all") {
+      //show only all pending transactions
+      transactions = await getFilteredTransactions(dayCount, null, user._id);
+    } else if (dayCount == "pending" && userAccounts.includes(bankId)) {
+      //show pending accounts on a specific account
       transactions = await getFilteredTransactions(dayCount, bankId, user._id);
     }
-
-    // let today = new Date();
-    // today.setDate(new Date().getDate() - 2);
-    // // "date": "2023-12-30T18:13:22.186Z"
-
-    res
-      .status(200)
-      .json({ count: transactions.length, transactions: transactions });
+    res.status(200).json({
+      count: transactions.length,
+      transactions: transactions,
+      date: moment(),
+      dayCount: dayCount,
+    });
   } catch (err) {
     console.error("Error getting bank transactions:", err);
     res
@@ -340,7 +346,7 @@ export const getBankTransactions = async (req, res) => {
 
 /**
  * helper function that gets ALL of user's transactions for a specific account
- * @return unfiltered (MANY) transactions
+ * @return array of unfiltered transactions
  */
 const getAllTransactions = async (userId, bankId) => {
   if (bankId == null) {
@@ -355,13 +361,25 @@ const getAllTransactions = async (userId, bankId) => {
  * @param dayCount either 30, 60, pending, or all.
  * @param bankId bankid to used to filter in the query
  * @param userId user who called the function
- * @returns
+ * @returns array of fitered transactions
  */
 const getFilteredTransactions = async (dayCount, bankId, userId) => {
-  if (bankId == null) {
-    //all user accounts
-    return await FinanceModel.find({ userId: userId });
+  const startDate = moment();
+  const endDate = moment().subtract(dayCount, "days");
+
+  if (dayCount == "pending" && bankId == null) {
+    return await FinanceModel.find({ userId: userId, pending: true });
+  } else if (bankId == null) {
+    return await FinanceModel.find({
+      userId: userId,
+      date: { $gte: endDate, $lte: startDate },
+    });
+  } else if (dayCount == "pending") {
+    return await FinanceModel.find({ bank_account_id: bankId, pending: true });
   } else {
-    return await FinanceModel.find({ bankId: bankId });
+    return await FinanceModel.find({
+      bank_account_id: bankId,
+      date: { $gte: endDate, $lte: startDate },
+    });
   }
 };

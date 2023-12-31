@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { loadType } from "mongoose-currency";
-loadType(mongoose);
+// import { loadType } from "mongoose-currency";
+// loadType(mongoose);
 
-let Currency = mongoose.Types.Currency;
+// let Currency = mongoose.Types.Currency;
 
 const UserSchema = new mongoose.Schema(
   {
