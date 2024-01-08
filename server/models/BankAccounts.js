@@ -5,8 +5,8 @@ const BankAccountSchema = new mongoose.Schema(
     institution: String,
     accounts: {
       balances: {
-        available: Number,
-        current: Number,
+        available: Number, //funds that can be immediately accessed (includes pending stuff)
+        current: Number, // total amount of funds in the account including any debts or assets
         iso_currency_code: String,
         limit: Number,
         unofficial_currency_code: String,

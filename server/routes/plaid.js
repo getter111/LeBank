@@ -2,6 +2,7 @@ import express from "express";
 import {
   createLinkToken,
   exchangePublicToken,
+  getBalance,
   getBankAccounts,
   getBankTransactions,
   setBankAccounts,
@@ -27,5 +28,8 @@ router.get("/transactions/sync/:username", setTransactions);
 
 //query database for user transactions
 router.post("/get-transactions/:count", getBankTransactions);
+
+//test
+router.get("/account/balance/get/:username", getBalance);
 
 export { router as plaidRouter };

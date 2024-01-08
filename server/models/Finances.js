@@ -13,6 +13,7 @@ const FinanceSchema = new mongoose.Schema({
   pendingTransactionId: String,
   pending: Boolean,
   icon: String,
+  paymentChannel: String,
 });
 
 //model for our users collection using the UserSchema

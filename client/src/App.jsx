@@ -5,7 +5,7 @@ import { useCookies } from "react-cookie";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { getUserDataWithName } from "./state/api.js";
 import { customTheme } from "./theme.js";
-import AccountInfo from "./views/AccountInfo/index.jsx";
+// import AccountInfo from "./views/AccountInfo/index.jsx";
 import Accountant from "./views/Accountant/index.jsx";
 import Auth from "./views/Auth/index.jsx";
 import BankViews from "./views/Bankviews/index.jsx";
@@ -101,12 +101,12 @@ function App() {
                   <Accountant user={user} setCurrentPage={setCurrentPage} />
                 }
               />
-              <Route
+              {/* <Route
                 path="/account-info"
                 element={
                   <AccountInfo setCurrentPage={setCurrentPage}></AccountInfo>
                 }
-              />
+              /> */}
             </Route>
           </Routes>
         </ThemeProvider>

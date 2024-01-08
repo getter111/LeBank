@@ -15,60 +15,58 @@ const BankInfo = ({ mergedArray }) => {
   const navigate = useNavigate();
   return (
     <>
-      {mergedArray.map(
-        ({ accounts, account_id, account, routing, institution }) => (
-          <div>
-            <FlexBox
+      {mergedArray.map(({ accounts, institution }) => (
+        <div>
+          <FlexBox
+            sx={{
+              justifyContent: "flex-start",
+              width: "100%",
+              margin: "0.2rem",
+              alignContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onClick={() => navigate("/account-info")}
+              variant="contained"
+              color="primary"
+              endIcon={<ChevronRightOutlined />}
               sx={{
-                justifyContent: "flex-start",
-                width: "100%",
-                margin: "0.2rem",
-                alignContent: "center",
-                alignItems: "center",
+                width: "45vw",
+                height: "4.5rem",
               }}
             >
-              <Button
-                onClick={() => navigate("/account-info")}
-                variant="contained"
-                color="primary"
-                endIcon={<ChevronRightOutlined />}
+              <FlexBox
                 sx={{
-                  width: "45vw",
-                  height: "4.5rem",
+                  justifyContent: "flex-start",
+                  width: "100%",
+                  flexWrap: "wrap",
+                  alignContent: "center",
+                  alignItems: "center",
+
+                  // margin: "auto",
                 }}
               >
-                <FlexBox
+                <AccountBalanceIcon
+                  sx={{ width: "5%", marginRight: "0.5rem" }}
+                />
+                <Typography
                   sx={{
-                    justifyContent: "flex-start",
-                    width: "100%",
-                    flexWrap: "wrap",
-                    alignContent: "center",
-                    alignItems: "center",
-
-                    // margin: "auto",
+                    flex: "2",
+                    flexShrink: "0",
+                    textAlign: "start",
                   }}
                 >
-                  <AccountBalanceIcon
-                    sx={{ width: "5%", marginRight: "0.5rem" }}
-                  />
-                  <Typography
-                    sx={{
-                      flex: "2",
-                      flexShrink: "0",
-                      textAlign: "start",
-                    }}
-                  >
-                    {institution + " " + accounts.name + " *" + "acc#"}
-                  </Typography>
-                  <Typography sx={{ flex: "1", flexShrink: "0" }}>
-                    {"Balance: " + "$1000"}
-                  </Typography>
-                </FlexBox>
-              </Button>
-            </FlexBox>
-          </div>
-        )
-      )}
+                  {institution + " " + accounts.name + " *" + accounts.mask}
+                </Typography>
+                <Typography sx={{ flex: "1", flexShrink: "0" }}>
+                  {"Balance: " + "$" + accounts.balances.available}
+                </Typography>
+              </FlexBox>
+            </Button>
+          </FlexBox>
+        </div>
+      ))}
     </>
   );
 };

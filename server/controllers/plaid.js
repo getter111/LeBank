@@ -260,6 +260,7 @@ export const setTransactions = async function (req, res) {
     ) {
       user.transactionsCursor = transactionsData.nextCursor;
       await user.save();
+      // res.json(transactionsData.added);
 
       // Map fields from the Plaid transaction response
       const transactionsToAdd = transactionsData.added.map((trans) => ({
@@ -277,6 +278,7 @@ export const setTransactions = async function (req, res) {
         pendingTransactionId: trans.pending_transaction_id,
         pending: trans.pending,
         icon: trans.personal_finance_category_icon_url,
+        paymentChannel: trans.payment_channel,
       }));
 
       // Save the fetched transactions to the MongoDB collection
@@ -330,6 +332,16 @@ export const getBankTransactions = async (req, res) => {
       //show pending accounts on a specific account
       transactions = await getFilteredTransactions(dayCount, bankId, user._id);
     }
+    // let arr = [];
+    // let count = 0;
+
+    // transactions.forEach((transaction) => {
+    //   if (transaction.name === "CREDIT CARD 3333 PAYMENT *//") {
+    //     count += 1;
+    //     arr.push(transaction.transaction_id);
+    //   }
+    // });
+
     res.status(200).json({
       count: transactions.length,
       transactions: transactions,
@@ -346,6 +358,8 @@ export const getBankTransactions = async (req, res) => {
 
 /**
  * helper function that gets ALL of user's transactions for a specific account
+ * @param userId user's id
+ * @param bankId user's bank account (can be null)
  * @return array of unfiltered transactions
  */
 const getAllTransactions = async (userId, bankId) => {
@@ -358,8 +372,8 @@ const getAllTransactions = async (userId, bankId) => {
 
 /**
  *
- * @param dayCount either 30, 60, pending, or all.
- * @param bankId bankid to used to filter in the query
+ * @param dayCount either 30, 60, "pending", or "global".
+ * @param bankId bankid to used to filter in the query (can be null)
  * @param userId user who called the function
  * @returns array of fitered transactions
  */
@@ -381,5 +395,29 @@ const getFilteredTransactions = async (dayCount, bankId, userId) => {
       bank_account_id: bankId,
       date: { $gte: endDate, $lte: startDate },
     });
+  }
+};
+
+export const getBalance = async function (req, res) {
+  try {
+    const plaidClient = plaidConfig();
+    const { username } = req.params; //url
+
+    const user = await UserModel.findOne({ username: username });
+    const accessToken = user.plaidAccessToken;
+
+    const plaidRequest = {
+      access_token: accessToken,
+    };
+
+    const plaidResponse = await plaidClient.accountsBalanceGet(plaidRequest);
+
+    const accounts = plaidResponse.data.accounts;
+    res.status(200).json({
+      accounts,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json("something happened when getting balances.");
   }
 };

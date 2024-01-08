@@ -135,17 +135,16 @@ export async function setBankTransactions(user) {
 
 /**
  * function that querys the database for certain (count) of transactions
- * @param user verified user to get the transactions from
- * @param count the number of days to limit transactions queried
+ * @param username verified user to get the transactions from
+ * @param dayCount the number of days to limit transactions queried
+ * @param bankId the specified bank account
  * @returns list of transactions
  */
+
 export async function getBankTransactions(username, dayCount, bankId) {
   try {
-    //add a bankid param to differentiate which acc, if not all of them...
     const base_url = import.meta.env.VITE_BASE_URL;
     const endpoint = base_url + "/plaid/get-transactions/" + dayCount;
-
-    //duplication of count
 
     return await axios.post(endpoint, {
       username: username,
