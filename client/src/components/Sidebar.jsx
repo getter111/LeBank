@@ -1,16 +1,16 @@
 import {
-  AccountBalanceIcon,
   ChevronLeft,
   ChevronRightOutlined,
-  EmailIcon,
-  GitHubIcon,
-  HelpIcon,
   HomeOutlined,
-  LinkedInIcon,
-  ManageAccountsIcon,
   ReceiptLongOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import EmailIcon from "@mui/icons-material/Email";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import HelpIcon from "@mui/icons-material/Help";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import {
   Box,
   Divider,

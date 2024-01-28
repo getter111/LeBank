@@ -51,7 +51,7 @@ export const TransactionStack = ({ transactions }) => {
           totalBalance={6969}
         />
       ))}
-      {transactions.length}
+      {"Total Transactions: " + transactions.length}
     </Stack>
   );
 };

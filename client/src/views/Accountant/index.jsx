@@ -1,53 +1,143 @@
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import FlexBox from "../../components/FlexBox.jsx";
-import { getBankTransactions } from "../../state/api.js";
+import { getBankAccounts, getBankTransactions } from "../../state/api.js";
 import { ActionsTab } from "./ActionsTab.jsx";
+import { SelectMenu } from "./SelectMenu.jsx";
 import { TransactionStack } from "./TransactionStack.jsx";
 
-const Accountant = ({ setCurrentPage, user }) => {
-  const theme = useTheme();
+// THERE IS SOMETHING WRONG WITH STATE. INCONSISTENT STATE SOMEWHERE MAYBE BANKID OR DAYCOUNT. BC IT IS NOT GETTING UPDATED AT THE SAME TIME? RESUTS IN TRANSACTIONS NOT BEING ACCURATE
 
+const Accountant = ({ setCurrentPage, user }) => {
   //state for transactions api call
   const [transactions, setTransactions] = useState([]);
   const [dayCount, setDayCount] = useState("30");
   const [bankId, setBankId] = useState("all");
 
-  //select menu stuff
-  const selectMenuOptions = [
-    "Plaid Gold Standard 0% Interest Checking",
-    "Plaid Silver Standard 0.1% Interest Saving",
-    "1111222233331111",
-    "1111222233330000",
+  //state for bank selectmenu
+  const [bankAnchorEl, setBankAnchorEl] = useState(null);
+  const [selectedBankIndex, setSelectedBankIndex] = useState(0);
+
+  //state for day selectmenu
+  const [dayAnchorEl, setDayAnchorEl] = useState(null);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+
+  //state for ActionsTab filter buttons. true==expanded
+  const [dateFilter, setDateFilter] = useState(false);
+  const [descriptFilter, setDescriptFilter] = useState(false);
+  const [typeFilter, setTypeFilter] = useState(false);
+  const [costFilter, setCostFilter] = useState(false);
+
+  //array of bank account info objects
+  const [bankAccountInfo, setBankAccountInfo] = useState([]);
+  const [BANK_OPTIONS, setBankOptions] = useState(["View All"]);
+
+  const handleFilterClick = (index) => {
+    switch (index) {
+      case 1:
+        setDateFilter(!dateFilter);
+        break;
+      case 2:
+        setDescriptFilter(!descriptFilter);
+        break;
+      case 3:
+        setTypeFilter(!typeFilter);
+        break;
+      case 4:
+        setCostFilter(!costFilter);
+        break;
+    }
+  };
+
+  const handleClickBankListItem = (event) => {
+    setBankAnchorEl(event.currentTarget);
+    console.log(
+      selectedBankIndex === bankAccountInfo.length
+        ? "bank list was cicked bank info: all"
+        : "bank list was clicked now showing bank info: " +
+            bankAccountInfo[selectedBankIndex].accounts.account_id
+    );
+    // console.log(event.currentTarget);
+    console.log("clcik list event " + BANK_OPTIONS);
+    console.log("clcik list event bank id " + bankId);
+
+    console.log("///////////////////////////////////////////////////////////");
+
+    //maybe call a another function here to rerender???
+  };
+
+  //problem with state sync maybe because useeffect gets called first and it uses selectedIndex.when trying to use selectedBankIndex immediately after calling setSelectedBankIndex(index), it might not have updated yet. so just use index
+  const handleBankMenuItemClick = (event, index) => {
+    setSelectedBankIndex(index);
+    handleBankClose();
+    console.log("click event bankoptions: " + BANK_OPTIONS[index]);
+    console.log("click event the selected bank index is: " + index);
+
+    //set bankID to the selected bank account //using callback bc new state relies on prev state
+    setBankId((prevBankId) =>
+      index === bankAccountInfo.length
+        ? "all"
+        : bankAccountInfo[index].accounts.account_id
+    );
+
+    //if bankid is null aka all aka undefined meaning it is view all..
+    // if (bankId == null || bankId == undefined) {
+    //   console.log(
+    //     "click event use all" +
+    //       "bankAccount length == " +
+    //       bankAccountInfo.length
+    //   );
+    // }
+
+    console.log(
+      "click event use all" + "bankAccount length == " + bankAccountInfo.length
+    );
+    console.log("click event bankid: " + bankId);
+    console.log("///////////////////////////////////////////////////////////");
+  };
+  const handleBankClose = () => {
+    setBankAnchorEl(null);
+  };
+
+  //DAYS select menu
+  const DAY_OPTIONS = [
+    "Last 30 Days",
+    "Last 60 Days",
+    "Pending only",
+    "All availiable",
   ];
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-  const open = Boolean(anchorEl);
-  const handleClickListItem = (event) => {
-    setAnchorEl(event.currentTarget);
-    console.log(event.currentTarget);
+  const handleClickDayListItem = (event) => {
+    setDayAnchorEl(event.currentTarget);
+    // console.log(event.currentTarget);
+  };
+  const handleDayMenuItemClick = (event, index) => {
+    setSelectedDayIndex(index);
+    console.log(DAY_OPTIONS[index]);
+    console.log("the selected day index is: " + index);
+
+    handleDayClose();
+    switch (index) {
+      case 0:
+        setDayCount(30);
+        break;
+      case 1:
+        setDayCount(60);
+        break;
+      case 2:
+        setDayCount("pending");
+        break;
+      case 3:
+        setDayCount("global");
+        break;
+      default:
+        setDayCount(30);
+    }
+  };
+  const handleDayClose = () => {
+    setDayAnchorEl(null);
   };
 
-  const handleMenuItemClick = (event, index) => {
-    setSelectedIndex(index);
-    setAnchorEl(null);
-    console.log(index);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  /////////////////////////////////////////////////////////////
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -57,6 +147,7 @@ const Accountant = ({ setCurrentPage, user }) => {
           dayCount,
           bankId
         );
+        console.log("day: " + dayCount + " bank: " + bankId);
         console.log(
           "transaction fetched: ",
           transactionsData.data.transactions
@@ -68,12 +159,51 @@ const Accountant = ({ setCurrentPage, user }) => {
       }
     };
 
-    fetchTransactions();
-  }, [user]);
+    const fectchBanks = async () => {
+      try {
+        const fectchedData = await getBankAccounts(user);
+        const bankAccountData = fectchedData.data.accountInfoList;
+        setBankAccountInfo(bankAccountData);
 
-  useEffect(() => {
-    console.log("Updated transactions:", transactions);
-  }, [transactions]);
+        console.log("useeffect bank index: " + selectedBankIndex);
+        console.log("useeffect day index: " + dayCount);
+        console.log(
+          selectedBankIndex == bankAccountInfo.length
+            ? "useeffect bankaccountinfo == all"
+            : "useeffect bankaccountinfo: " +
+                bankAccountInfo[selectedBankIndex].accounts.account_id
+        );
+
+        const bankOptions = bankAccountData.map((account) => {
+          return (
+            account.institution +
+            " " +
+            account.accounts.name +
+            " *" +
+            account.accounts.mask
+          );
+        });
+        bankOptions.push("View All");
+
+        setBankOptions(bankOptions);
+        console.log(
+          "useeffect bank options " +
+            bankOptions[0] +
+            bankOptions[1] +
+            bankOptions[2]
+        );
+        console.log("useeffect bankid: " + bankId);
+
+        console.log(
+          "///////////////////////////////////////////////////////////"
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fectchBanks();
+    fetchTransactions();
+  }, [user, dayCount, bankId, selectedBankIndex]);
 
   return (
     <FlexBox
@@ -87,98 +217,41 @@ const Accountant = ({ setCurrentPage, user }) => {
         sx={{
           width: "49vw",
           justifyContent: "flex-start",
-          flexDirection: "row",
+          alignItems: "flex-start",
+          flexDirection: "column",
+          marginTop: "1em",
+          marginBottom: "20px",
         }}
       >
-        {/* Last (x) days button */}
-        <Button
-          onClick={() => {
-            console.log("hi");
-          }}
-          variant="contained"
-          color="primary"
-          endIcon={<ExpandMoreIcon />}
-          sx={{ alignSelf: "flex-start", marginBottom: "1em" }}
-        >
-          Last 30 Days
-        </Button>
-        <List
-          component="nav"
-          aria-label="Device settings"
-          sx={{ bgcolor: theme.palette.primary.main }}
-        >
-          <ListItem
-            button
-            id="lock-button"
-            aria-haspopup="listbox"
-            aria-controls="lock-menu"
-            aria-label="selected bank account"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClickListItem}
-          >
-            <ListItemText
-              sx={{
-                "& .MuiListItemText-primary": {
-                  color: "green",
-                },
-                "& .MuiListItemText-secondary": {
-                  color: "blue",
-                },
-              }}
-              primary={`Selected Bank Account: ${selectMenuOptions[selectedIndex]}`}
-              secondary={selectMenuOptions[selectedIndex]}
-            />
-            <IconButton
-              edge="end"
-              aria-label="expand more"
-              aria-haspopup="true"
-              size="small"
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          </ListItem>
-        </List>
-        <Menu
-          id="lock-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            "aria-labelledby": "lock-button",
-            role: "listbox",
-          }}
-          sx={{
-            "& ul": {
-              backgroundColor: theme.palette.primary.main,
-            },
-          }}
-        >
-          {selectMenuOptions.map((option, index) => (
-            <MenuItem
-              key={option}
-              // disabled={index === 0}
-              selected={index === selectedIndex}
-              onClick={(event) => handleMenuItemClick(event, index)}
-              sx={{
-                color:
-                  index === selectedIndex
-                    ? "green"
-                    : theme.palette.text.secondary,
-                borderBottom:
-                  index === selectedIndex
-                    ? `2px solid ${theme.palette.secondary.main}`
-                    : "none",
-                "&:hover": {
-                  color: index === selectedIndex ? "white" : "green",
-                },
-              }}
-            >
-              {option}
-            </MenuItem>
-          ))}
-        </Menu>
+        <Box sx={{ padding: "40px 0" }}>
+          <Typography>Available Balance</Typography>
+          <Typography>$2,512.99</Typography>
+          <SelectMenu
+            selectMenuOptions={BANK_OPTIONS}
+            anchorEl={bankAnchorEl}
+            selectedIndex={selectedBankIndex}
+            handleClickListItem={handleClickBankListItem}
+            handleMenuItemClick={handleBankMenuItemClick}
+            handleClose={handleBankClose}
+          />
+        </Box>
+
+        <SelectMenu
+          selectMenuOptions={DAY_OPTIONS}
+          anchorEl={dayAnchorEl}
+          selectedIndex={selectedDayIndex}
+          handleClickListItem={handleClickDayListItem}
+          handleMenuItemClick={handleDayMenuItemClick}
+          handleClose={handleDayClose}
+        />
       </FlexBox>
-      <ActionsTab />
+      <ActionsTab
+        handleFilterClick={handleFilterClick}
+        dateFilterExpanded={dateFilter}
+        descriptFilterExpanded={descriptFilter}
+        typeFilterExpanded={typeFilter}
+        costFilterExpanded={costFilter}
+      />
       {transactions.length === 0 ? (
         <FlexBox
           sx={{

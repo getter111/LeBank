@@ -1,15 +1,14 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Button, List, ListItem, ListItemText, Stack } from "@mui/material";
 
-export const ActionsTab = () => {
+export const ActionsTab = ({
+  handleFilterClick,
+  dateFilterExpanded,
+  descriptFilterExpanded,
+  typeFilterExpanded,
+  costFilterExpanded,
+}) => {
   return (
     <List
       component={Stack}
@@ -19,10 +18,10 @@ export const ActionsTab = () => {
       <ListItem>
         <Button
           sx={{ flex: "1" }}
-          onClick={() => navigate("/")}
+          onClick={() => handleFilterClick(1)}
           variant="contained"
           color="primary"
-          endIcon={<ExpandMoreIcon />}
+          endIcon={dateFilterExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         >
           Date
         </Button>
@@ -30,21 +29,12 @@ export const ActionsTab = () => {
       <ListItem>
         <Button
           sx={{ flex: "1" }}
-          onClick={() => navigate("/")}
+          onClick={() => handleFilterClick(2)}
           variant="contained"
           color="primary"
-          endIcon={<ExpandMoreIcon />}
-        >
-          Type
-        </Button>
-      </ListItem>
-      <ListItem>
-        <Button
-          sx={{ flex: "1" }}
-          onClick={() => navigate("/")}
-          variant="contained"
-          color="primary"
-          endIcon={<ExpandMoreIcon />}
+          endIcon={
+            descriptFilterExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />
+          }
         >
           Description
         </Button>
@@ -52,10 +42,21 @@ export const ActionsTab = () => {
       <ListItem>
         <Button
           sx={{ flex: "1" }}
-          onClick={() => navigate("/")}
+          onClick={() => handleFilterClick(3)}
           variant="contained"
           color="primary"
-          endIcon={<ExpandMoreIcon />}
+          endIcon={typeFilterExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        >
+          Type
+        </Button>
+      </ListItem>
+      <ListItem>
+        <Button
+          sx={{ flex: "1" }}
+          onClick={() => handleFilterClick(4)}
+          variant="contained"
+          color="primary"
+          endIcon={costFilterExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         >
           Cost
         </Button>
